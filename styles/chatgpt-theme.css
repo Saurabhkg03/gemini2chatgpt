@@ -1,0 +1,929 @@
+/* ============================================================================
+ * ChatGPT Style for Gemini — Main Stylesheet
+ * ----------------------------------------------------------------------------
+ * Full ChatGPT component parity:
+ *  - Clean OLED-dark (#000000 canvas/sidebar, #173e76 user pill, #252528 code
+ *    cards, #1a1a1c composer pill) & crisp Light mode (#ffffff / #f9f9f9).
+ *  - Vibrant ChatGPT syntax highlighting (Highlight.js, Prism, & fallback tokens).
+ *  - Colorful Callout cards (Info, Success, Warning, Error, Tip).
+ *  - Status & HTTP method inline badges, progress bars, sleek tables, details,
+ *    task checkboxes, citations, and crisp section dividers.
+ *  - Zero global `*` font overrides; icon fonts, SVGs, & KaTeX remain untouched.
+ * ============================================================================ */
+
+/* ----------------------------------------------------------------------------
+ * 1. Design Tokens (Light & Dark synced via [data-cgf-theme])
+ * ---------------------------------------------------------------------------- */
+
+:root[data-cgf-enabled="true"] {
+  --cgf-font-ui: ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Helvetica, Arial, sans-serif;
+  --cgf-font-prose: ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Helvetica, Arial, sans-serif;
+  --cgf-font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --cgf-font-size: 16px;
+  --cgf-line-height: 1.68;
+  --cgf-measure: 48rem; /* ~768px ChatGPT reading column */
+
+  /* Light Mode Palette */
+  --cgf-bg-canvas: #ffffff;
+  --cgf-bg-sidebar: #f9f9f9;
+  --cgf-bg-sidebar-active: #ececec;
+  --cgf-bg-sidebar-hover: rgba(0, 0, 0, 0.045);
+  --cgf-bg-elevated: #ffffff;
+  --cgf-bg-composer: #ffffff;
+  --cgf-bg-user-bubble: #e8f1fc;
+  --cgf-text-user-bubble: #0d1b2a;
+  --cgf-text-primary: #0d0d0d;
+  --cgf-text-strong: #000000;
+  --cgf-text-secondary: #5d5d5d;
+  --cgf-text-muted: #8e8ea0;
+  --cgf-link: #2563eb;
+  --cgf-border-subtle: rgba(0, 0, 0, 0.08);
+  --cgf-border-strong: rgba(0, 0, 0, 0.15);
+  --cgf-code-bg: #f6f7f9;
+  --cgf-code-header: #ededf0;
+  --cgf-code-border: rgba(0, 0, 0, 0.09);
+  --cgf-code-text: #1f2328;
+  --cgf-inline-code-bg: #eceef2;
+  --cgf-inline-code-text: #111827;
+  --cgf-quote-bg: rgba(0, 0, 0, 0.025);
+  --cgf-quote-border: rgba(0, 0, 0, 0.22);
+  --cgf-table-hover: rgba(0, 0, 0, 0.025);
+  --cgf-shadow-composer: 0 2px 14px rgba(0, 0, 0, 0.06);
+
+  /* Light Syntax Tokens */
+  --cgf-syn-kw: #0550ae;
+  --cgf-syn-str: #0a7c5c;
+  --cgf-syn-fn: #7c3aed;
+  --cgf-syn-num: #cf222e;
+  --cgf-syn-key: #0969da;
+  --cgf-syn-type: #953800;
+  --cgf-syn-cmt: #6e7781;
+  --cgf-syn-op: #57606a;
+}
+
+/* Dark Mode — Balanced (Matches ChatGPT Reference: OLED black + #173e76 user pill + vibrant code) */
+:root[data-cgf-enabled="true"][data-cgf-theme="dark"] {
+  --cgf-bg-canvas: #000000;
+  --cgf-bg-sidebar: #000000;
+  --cgf-bg-sidebar-active: #1c1c1e;
+  --cgf-bg-sidebar-hover: rgba(255, 255, 255, 0.055);
+  --cgf-bg-elevated: #1c1c1f;
+  --cgf-bg-composer: #1a1a1c;
+  --cgf-bg-user-bubble: #173e76;
+  --cgf-text-user-bubble: #f0f6ff;
+  --cgf-text-primary: #e7e7ea;
+  --cgf-text-strong: #ffffff;
+  --cgf-text-secondary: #a1a1aa;
+  --cgf-text-muted: #71717a;
+  --cgf-link: #60a5fa;
+  --cgf-border-subtle: rgba(255, 255, 255, 0.1);
+  --cgf-border-strong: rgba(255, 255, 255, 0.16);
+  --cgf-code-bg: #36363a;
+  --cgf-code-header: transparent;
+  --cgf-code-border: rgba(255, 255, 255, 0.08);
+  --cgf-code-text: #ececf1;
+  --cgf-inline-code-bg: rgba(255, 255, 255, 0.12);
+  --cgf-inline-code-text: #f3f4f6;
+  --cgf-quote-bg: rgba(255, 255, 255, 0.03);
+  --cgf-quote-border: rgba(255, 255, 255, 0.25);
+  --cgf-table-hover: rgba(255, 255, 255, 0.03);
+  --cgf-shadow-composer: 0 4px 20px rgba(0, 0, 0, 0.5);
+
+  /* ChatGPT Reference Dark Syntax Tokens (pure CSS on native .hljs-* spans) */
+  --cgf-syn-kw: #ea8098;
+  --cgf-syn-str: #e4bc72;
+  --cgf-syn-fn: #b49ef0;
+  --cgf-syn-num: #e59c76;
+  --cgf-syn-key: #7eb8e8;
+  --cgf-syn-type: #b49ef0;
+  --cgf-syn-cmt: rgba(255, 255, 255, 0.5);
+  --cgf-syn-op: #d4d4d8;
+}
+
+/* Crisp Polish Mode — Classic ChatGPT Charcoal (#212121 / #171717) */
+:root[data-cgf-enabled="true"][data-cgf-polish="crisp"][data-cgf-theme="dark"] {
+  --cgf-bg-canvas: #212121;
+  --cgf-bg-sidebar: #171717;
+  --cgf-bg-sidebar-active: #2a2a2d;
+  --cgf-bg-composer: #2f2f2f;
+  --cgf-bg-user-bubble: #2f2f2f;
+  --cgf-text-user-bubble: #ececec;
+  --cgf-code-bg: #171717;
+  --cgf-code-header: #202023;
+  --cgf-border-subtle: rgba(255, 255, 255, 0.11);
+  --cgf-border-strong: rgba(255, 255, 255, 0.18);
+}
+
+:root[data-cgf-enabled="true"][data-cgf-polish="crisp"][data-cgf-theme="light"] {
+  --cgf-bg-sidebar: #f4f4f5;
+  --cgf-bg-user-bubble: #f0f0f2;
+  --cgf-text-user-bubble: #0d0d0d;
+  --cgf-border-subtle: rgba(0, 0, 0, 0.11);
+  --cgf-shadow-composer: 0 4px 18px rgba(0, 0, 0, 0.08);
+}
+
+/* Map Gemini internal Material/Bard tokens */
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]) {
+  --gem-sys-color--surface: var(--cgf-bg-canvas);
+  --gem-sys-color--surface-container: var(--cgf-bg-sidebar);
+  --gem-sys-color--surface-container-low: var(--cgf-bg-sidebar);
+  --gem-sys-color--surface-container-high: var(--cgf-bg-elevated);
+  --gem-sys-color--surface-container-highest: var(--cgf-bg-elevated);
+  --gem-sys-color--on-surface: var(--cgf-text-primary);
+  --gem-sys-color--on-surface-variant: var(--cgf-text-secondary);
+  --gem-sys-color--outline: var(--cgf-border-strong);
+  --gem-sys-color--outline-variant: var(--cgf-border-subtle);
+  --bard-color-surface: var(--cgf-bg-canvas);
+  --bard-color-main-background: var(--cgf-bg-canvas);
+  --bard-color-background: var(--cgf-bg-canvas);
+  --gem-sys-color--background: var(--cgf-bg-canvas);
+  --bard-color-input-background: var(--cgf-bg-composer);
+  --bard-color-footer-background: transparent;
+  --bard-color-gradient-background: transparent;
+  --bard-color-code-block-background: var(--cgf-code-bg);
+}
+
+/* ----------------------------------------------------------------------------
+ * 2. Safe Typography Application (Icons, Symbols, SVGs, Math Excluded)
+ * ---------------------------------------------------------------------------- */
+
+:root[data-cgf-enabled="true"] body {
+  font-family: var(--cgf-font-ui);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+:root[data-cgf-enabled="true"][data-cgf-preset="inter"] :is(
+  message-content,
+  .markdown,
+  .markdown-main-panel,
+  .query-text
+) {
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+:root[data-cgf-enabled="true"] :is(
+  bard-sidenav,
+  .chat-history,
+  .conversation-title,
+  side-nav-entry-button,
+  input-container,
+  rich-textarea,
+  .ql-editor,
+  textarea,
+  input,
+  button,
+  label,
+  [role="menuitem"],
+  [role="option"]
+):not(mat-icon):not(.mat-icon):not(google-symbols):not(.google-symbols):not([class*="material-"]):not([class*="symbol"]):not([class*="icon"]):not(svg):not(.katex):not(mjx-container) {
+  font-family: var(--cgf-font-ui);
+}
+
+:root[data-cgf-enabled="true"] :is(
+  message-content,
+  .markdown,
+  .markdown-main-panel,
+  model-response,
+  user-query,
+  user-query-content,
+  .query-text,
+  .response-content
+) :is(
+  p,
+  li,
+  ul,
+  ol,
+  blockquote,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  td,
+  th,
+  dt,
+  dd,
+  strong,
+  em,
+  a,
+  summary,
+  span:not(mat-icon):not(.mat-icon):not(google-symbols):not(.google-symbols):not([class*="material-"]):not([class*="symbol"]):not([class*="icon"]):not([class*="katex"]),
+  div:not(code-block):not(.code-block):not([class*="icon"]):not([class*="symbol"]):not([class*="katex"]):not(mjx-container)
+):not(pre):not(code):not(kbd):not(samp):not(mat-icon):not(.mat-icon):not(google-symbols):not(.google-symbols):not([class*="material-"]):not([class*="symbol"]):not([class*="icon"]):not(svg):not([class*="katex"]):not(.katex *):not(mjx-container):not(mjx-container *) {
+  font-family: var(--cgf-font-prose);
+}
+
+:root[data-cgf-enabled="true"] :is(
+  message-content,
+  .markdown,
+  .markdown-main-panel,
+  .query-text,
+  user-query-content
+) {
+  font-size: var(--cgf-font-size);
+  line-height: var(--cgf-line-height);
+}
+
+:root[data-cgf-enabled="true"] :is(
+  message-content,
+  .markdown,
+  .markdown-main-panel,
+  .query-text,
+  user-query-content
+) :is(p, li, blockquote, td, th) {
+  font-size: var(--cgf-font-size);
+  line-height: var(--cgf-line-height);
+}
+
+/* ----------------------------------------------------------------------------
+ * 3. Reading Column, Hierarchy, Links, Lists, Tables, Dividers & Math
+ * ---------------------------------------------------------------------------- */
+
+:root[data-cgf-enabled="true"] :is(
+  .conversation-container,
+  response-container,
+  user-query
+) {
+  max-width: min(100%, var(--cgf-measure));
+  margin-left: auto;
+  margin-right: auto;
+}
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) p {
+  margin-top: 0;
+  margin-bottom: 0.95em;
+  letter-spacing: -0.003em;
+}
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) p:last-child {
+  margin-bottom: 0;
+}
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) strong {
+  font-weight: 650;
+  color: var(--cgf-text-strong);
+}
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) a:not([class*="chip"]):not([class*="citation"]) {
+  color: var(--cgf-link);
+  text-decoration: none;
+  text-underline-offset: 3px;
+}
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) a:not([class*="chip"]):not([class*="citation"]):hover {
+  text-decoration: underline;
+}
+
+/* Clear ChatGPT Headings Hierarchy */
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) :is(h1, h2, h3, h4) {
+  font-family: var(--cgf-font-prose);
+  font-weight: 650;
+  color: var(--cgf-text-strong);
+  letter-spacing: -0.018em;
+  line-height: 1.32;
+  margin-top: 1.45em;
+  margin-bottom: 0.55em;
+}
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) h1 { font-size: 1.5em; }
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) h2 { font-size: 1.26em; }
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) h3 { font-size: 1.1em; }
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) h4 { font-size: 1em; font-weight: 600; }
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) :is(h1, h2, h3, h4):first-child {
+  margin-top: 0.1em;
+}
+
+/* Lists (preserve native marker to avoid double bullets) */
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) ul,
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) ol {
+  margin-top: 0.35em;
+  margin-bottom: 1em;
+  padding-left: 1.45em;
+}
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) li {
+  margin-bottom: 0.38em;
+}
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) li:last-child {
+  margin-bottom: 0;
+}
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) li > p {
+  margin-bottom: 0.42em;
+}
+
+/* Task List Checkboxes */
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) input[type="checkbox"] {
+  accent-color: #10a37f;
+  width: 15px;
+  height: 15px;
+  margin-right: 7px;
+  vertical-align: -2px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Section Dividers */
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) hr {
+  border: 0;
+  border-top: 1px solid var(--cgf-border-subtle);
+  margin: 1.65em 0;
+}
+
+/* ChatGPT-style Clean Tables */
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) :is(.table-block, .table-container, table-block) {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.15em 0;
+  font-size: 0.92em;
+  background: transparent !important;
+}
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) :is(th, td) {
+  padding: 10px 14px;
+  border: 0;
+  border-bottom: 1px solid var(--cgf-border-subtle);
+  text-align: left;
+  font-size: 0.92em;
+  line-height: 1.5;
+  vertical-align: top;
+}
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) th {
+  font-weight: 650;
+  color: var(--cgf-text-strong);
+  border-bottom: 1px solid var(--cgf-border-strong);
+}
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) tbody tr:hover {
+  background-color: var(--cgf-table-hover);
+}
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) :is(
+  .table-footer,
+  .table-actions,
+  .export-sheets-button
+) {
+  opacity: 0.72;
+}
+
+/* KaTeX Math Breathing Room */
+:root[data-cgf-enabled="true"] .katex-display {
+  margin: 1.15em 0 !important;
+  padding: 0.35em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+/* Details / Collapsible Spoilers */
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) details {
+  border: 1px solid var(--cgf-border-subtle);
+  background: var(--cgf-quote-bg);
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin: 1em 0;
+}
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) details > summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--cgf-text-strong);
+  list-style-position: inside;
+}
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) details[open] > summary {
+  margin-bottom: 8px;
+}
+
+/* Citations */
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) :is(
+  .source-inline-chip,
+  .citation-chip,
+  sup a
+) {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background-color: var(--cgf-inline-code-bg);
+  color: var(--cgf-link);
+  font-size: 11.5px;
+  font-weight: 550;
+  text-decoration: none;
+  margin: 0 2px;
+}
+
+/* ----------------------------------------------------------------------------
+ * 4. Blockquotes & Inline Code
+ * ---------------------------------------------------------------------------- */
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) blockquote {
+  margin: 1.05em 0;
+  padding: 10px 15px;
+  border-left: 3px solid var(--cgf-quote-border);
+  background: var(--cgf-quote-bg);
+  border-radius: 0 10px 10px 0;
+}
+
+:root[data-cgf-enabled="true"] :is(
+  pre,
+  code,
+  kbd,
+  samp,
+  code-block pre,
+  code-block code,
+  .code-block pre,
+  .code-block code
+):not(.katex):not(.katex *):not(mjx-container):not(mjx-container *) {
+  font-family: var(--cgf-font-mono);
+  font-variant-ligatures: none;
+  letter-spacing: 0;
+}
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) :not(pre) > code:not(.katex *),
+:root[data-cgf-enabled="true"] .query-text :not(pre) > code {
+  font-size: 0.855em;
+  padding: 0.15em 0.44em;
+  border-radius: 6px;
+  white-space: break-spaces;
+  word-break: break-word;
+}
+
+:root[data-cgf-enabled="true"] kbd {
+  font-size: 0.82em;
+  padding: 0.14em 0.45em;
+  border-radius: 6px;
+  border: 1px solid var(--cgf-border-strong);
+  background: var(--cgf-inline-code-bg);
+}
+
+/* ----------------------------------------------------------------------------
+ * 5. Code Blocks & ChatGPT Syntax Highlighting
+ * ---------------------------------------------------------------------------- */
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) pre {
+  overflow-x: auto;
+  white-space: pre;
+  word-wrap: normal;
+  word-break: normal;
+  tab-size: 2;
+  padding: 15px 18px;
+  margin: 0;
+  font-size: 0.87em;
+  line-height: 1.58;
+  border-radius: 14px;
+  color: var(--cgf-code-text);
+}
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) pre code {
+  white-space: pre;
+  font-size: inherit;
+  line-height: inherit;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  color: var(--cgf-code-text);
+}
+
+/* ChatGPT-matched Syntax Colors (pure CSS on Gemini's Highlight.js / Prism spans) */
+:root[data-cgf-enabled="true"] :is(pre, code-block) :is(
+  .hljs-keyword,
+  .hljs-selector-tag,
+  .hljs-doctag,
+  .token.keyword,
+  .token.atrule
+) {
+  color: var(--cgf-syn-kw) !important;
+  font-weight: 500;
+}
+
+:root[data-cgf-enabled="true"] :is(pre, code-block) :is(
+  .hljs-string,
+  .hljs-regexp,
+  .hljs-template-variable,
+  .token.string,
+  .token.char,
+  .token.regex
+) {
+  color: var(--cgf-syn-str) !important;
+}
+
+:root[data-cgf-enabled="true"] :is(pre, code-block) :is(
+  .hljs-title,
+  .hljs-title.function_,
+  .hljs-built_in,
+  .hljs-section,
+  .hljs-selector-id,
+  .hljs-selector-class,
+  .token.function,
+  .token.builtin
+) {
+  color: var(--cgf-syn-fn) !important;
+}
+
+:root[data-cgf-enabled="true"] :is(pre, code-block) :is(
+  .hljs-number,
+  .hljs-literal,
+  .hljs-symbol,
+  .hljs-bullet,
+  .token.number,
+  .token.boolean,
+  .token.constant
+) {
+  color: var(--cgf-syn-num) !important;
+}
+
+:root[data-cgf-enabled="true"] :is(pre, code-block) :is(
+  .hljs-attr,
+  .hljs-attribute,
+  .hljs-property,
+  .hljs-variable,
+  .hljs-tag,
+  .hljs-name,
+  .hljs-title.class_,
+  .hljs-type,
+  .token.property,
+  .token.attr-name,
+  .token.tag,
+  .token.class-name
+) {
+  color: var(--cgf-syn-key) !important;
+}
+
+:root[data-cgf-enabled="true"] :is(pre, code-block) :is(
+  .hljs-params,
+  .hljs-subst
+) {
+  color: var(--cgf-code-text) !important;
+}
+
+:root[data-cgf-enabled="true"] :is(pre, code-block) :is(
+  .hljs-comment,
+  .hljs-quote,
+  .token.comment
+) {
+  color: var(--cgf-syn-cmt) !important;
+  font-style: normal !important;
+}
+
+:root[data-cgf-enabled="true"] :is(pre, code-block) :is(
+  .hljs-operator,
+  .hljs-punctuation,
+  .token.operator,
+  .token.punctuation
+) {
+  color: var(--cgf-syn-op) !important;
+}
+
+:root[data-cgf-enabled="true"] :is(pre, code-block) :is(.hljs-addition, .token.inserted) {
+  color: #34d399 !important;
+  background: rgba(52, 211, 153, 0.12);
+  display: inline-block;
+  min-width: 100%;
+}
+
+:root[data-cgf-enabled="true"] :is(pre, code-block) :is(.hljs-deletion, .token.deleted) {
+  color: #f87171 !important;
+  background: rgba(248, 113, 113, 0.12);
+  display: inline-block;
+  min-width: 100%;
+}
+
+/* ----------------------------------------------------------------------------
+ * 7. Sleek ChatGPT Surfaces (Applied in 'balanced' and 'crisp' modes)
+ * ---------------------------------------------------------------------------- */
+
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]),
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]) :is(
+  body,
+  chat-app,
+  main,
+  chat-window,
+  .chat-window,
+  mat-sidenav-container,
+  mat-sidenav-content,
+  .main-container,
+  .top-bar-container,
+  top-bar-actions
+) {
+  background-color: var(--cgf-bg-canvas) !important;
+  color: var(--cgf-text-primary);
+}
+
+/* Sidebar Surface & Rounded ChatGPT Pills */
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]) :is(
+  bard-sidenav,
+  mat-sidenav,
+  .sidenav-with-history-container,
+  side-navigation-content,
+  .side-nav-content
+) {
+  background-color: var(--cgf-bg-sidebar) !important;
+  border-right: 0 !important;
+}
+
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]) bard-sidenav :is(
+  .sidenav-footer,
+  .side-nav-footer,
+  .account-container,
+  .user-profile-container
+) {
+  background-color: var(--cgf-bg-sidebar) !important;
+}
+
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]) bard-sidenav :is(
+  .conversation,
+  side-nav-entry-button,
+  a.conversation-link,
+  .bot-item
+) {
+  border-radius: 10px !important;
+  margin-left: 6px;
+  margin-right: 6px;
+  transition: background-color 120ms ease;
+}
+
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]) bard-sidenav :is(
+  .conversation:hover,
+  side-nav-entry-button:hover
+) {
+  background-color: var(--cgf-bg-sidebar-hover) !important;
+}
+
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]) bard-sidenav :is(
+  .conversation.selected,
+  .conversation[aria-selected="true"],
+  .selected
+) {
+  background-color: var(--cgf-bg-sidebar-active) !important;
+}
+
+/* Eliminate Gemini's dark gray bottom fade bar / scrim above the composer */
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]) .input-gradient,
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]) .bottom-gradient,
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]) input-container::before,
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]) input-container::after,
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]) .input-area-container::before,
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]) .input-area-container::after,
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]) input-area-v2::before,
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]) input-area-v2::after,
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]) chat-window-content::before,
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]) chat-window-content::after,
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]) .chat-container::after,
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]) infinite-scroller::after,
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]) :is(
+  chat-window,
+  chat-window-content,
+  input-container,
+  .input-area-container,
+  input-area-v2,
+  .bottom-container
+) :is([class*="gradient"], [class*="fade"], [class*="scrim"]) {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+/* Response Prose Color */
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]) :is(
+  message-content,
+  .markdown,
+  .markdown-main-panel,
+  .model-response-text
+) {
+  color: var(--cgf-text-primary);
+}
+
+/* User Query Bubble — Single Sleek ChatGPT Pill (ZERO nested double-boxes) */
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]) :is(
+  .user-query-bubble-with-background,
+  user-query-content:not(:has(.user-query-bubble-with-background)) .query-content
+) {
+  background-color: var(--cgf-bg-user-bubble) !important;
+  color: var(--cgf-text-user-bubble) !important;
+  border-radius: 22px !important;
+  padding: 10px 18px !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: none !important;
+  max-width: min(74%, 540px);
+}
+
+:root[data-cgf-enabled="true"][data-cgf-theme="light"]:not([data-cgf-polish="subtle"]) :is(
+  .user-query-bubble-with-background,
+  user-query-content:not(:has(.user-query-bubble-with-background)) .query-content
+) {
+  border-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]) .user-query-bubble-with-background :is(
+  .query-content,
+  .query-text,
+  .query-text-line,
+  user-query-content,
+  p,
+  div,
+  span
+) {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  color: var(--cgf-text-user-bubble) !important;
+}
+
+/* Code Block Card — Seamless Rounded 16px ChatGPT Code Card (Zero Nested Padding) */
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]) :is(
+  code-block,
+  .code-block:not(code-block *)
+) {
+  display: block;
+  background-color: var(--cgf-code-bg) !important;
+  border: 1px solid var(--cgf-code-border) !important;
+  border-radius: 16px !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  margin: 1em 0 !important;
+  box-shadow: none !important;
+}
+
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]) code-block > :not(style),
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]) :is(
+  code-block .code-block,
+  code-block .formatted-code-block-internal-container,
+  code-block .code-container,
+  .code-block .formatted-code-block-internal-container
+) {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]) :is(
+  .code-block-decoration,
+  code-block .code-block-decoration
+) {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  margin: 0 !important;
+  min-height: 0 !important;
+  height: auto !important;
+  padding: 12px 14px 4px 18px !important;
+  color: var(--cgf-text-secondary) !important;
+  font-size: 12.5px !important;
+  font-weight: 550 !important;
+}
+
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]) :is(
+  code-block pre,
+  .code-block pre
+) {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+  padding: 8px 18px 16px 18px !important;
+}
+
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]) :is(
+  code-block pre code,
+  .code-block pre code
+) {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]) :is(
+  .markdown,
+  .markdown-main-panel,
+  message-content,
+  .query-text
+) :not(pre) > code:not(.katex *) {
+  background-color: var(--cgf-inline-code-bg) !important;
+  color: var(--cgf-inline-code-text) !important;
+}
+
+/* Composer Pill — Strip Outer Rectangles, Style Only the Single Pill */
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]) :is(
+  input-container,
+  .input-area-container,
+  input-area-v2,
+  .input-box-wrapper,
+  .bottom-container
+) {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]) :is(
+  input-area-v2,
+  .input-area-container
+) {
+  max-width: min(100%, var(--cgf-measure)) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]) .text-input-field {
+  background-color: var(--cgf-bg-composer) !important;
+  border: 1px solid var(--cgf-border-strong) !important;
+  border-radius: 28px !important;
+  box-shadow: var(--cgf-shadow-composer) !important;
+  padding: 8px 14px !important;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]) .text-input-field:focus-within {
+  border-color: rgba(255, 255, 255, 0.25) !important;
+}
+
+:root[data-cgf-enabled="true"][data-cgf-theme="light"]:not([data-cgf-polish="subtle"]) .text-input-field:focus-within {
+  border-color: rgba(0, 0, 0, 0.25) !important;
+}
+
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]) .text-input-field :is(
+  .text-input-field-main-area,
+  .text-input-field_textarea-wrapper,
+  rich-textarea,
+  .ql-container,
+  .ql-editor,
+  .leading-actions-wrapper,
+  .trailing-actions-wrapper
+) {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+:root[data-cgf-enabled="true"] :is(rich-textarea .ql-editor, rich-textarea textarea, .text-input-field textarea) {
+  font-family: var(--cgf-font-ui);
+  font-size: clamp(14.5px, var(--cgf-font-size), 16.5px);
+  line-height: 1.5;
+}
+
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]) :is(
+  .hallucination-disclaimer,
+  hallucination-disclaimer,
+  .disclaimer-container,
+  .footer-container
+) {
+  background: transparent !important;
+  background-color: transparent !important;
+  opacity: 0.6;
+  font-size: 11.5px !important;
+  color: var(--cgf-text-muted) !important;
+}
+
+/* Subtle Thin Scrollbars */
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]) :is(
+  infinite-scroller,
+  pre,
+  bard-sidenav
+)::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]) :is(
+  infinite-scroller,
+  pre,
+  bard-sidenav
+)::-webkit-scrollbar-thumb {
+  background-color: var(--cgf-border-strong);
+  border-radius: 999px;
+}
+
+:root[data-cgf-enabled="true"]:not([data-cgf-polish="subtle"]) :is(
+  infinite-scroller,
+  pre,
+  bard-sidenav
+)::-webkit-scrollbar-track {
+  background: transparent;
+}

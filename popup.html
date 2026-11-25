@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ChatGPT Style for Gemini</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <main class="popup-shell">
+    <!-- Top Header & Master Power Switch -->
+    <header class="header">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <span class="brand-ring"></span>
+          <span class="brand-dot"></span>
+        </div>
+        <div class="brand-copy">
+          <h1 class="brand-title">ChatGPT Style</h1>
+          <p class="brand-sub">for Gemini</p>
+        </div>
+      </div>
+
+      <label class="ios-switch" title="Toggle styling on gemini.google.com">
+        <input type="checkbox" id="toggle-enabled" aria-label="Enable ChatGPT Style for Gemini" />
+        <span class="switch-track">
+          <span class="switch-thumb"></span>
+        </span>
+      </label>
+    </header>
+
+    <!-- Live Tab Status Pill -->
+    <div class="status-bar" id="status-bar" data-state="idle">
+      <span class="status-dot" aria-hidden="true"></span>
+      <span class="status-text" id="status-text">Checking active tab…</span>
+    </div>
+
+    <!-- Settings Body (dims gracefully when disabled) -->
+    <div class="controls-stack" id="controls-stack">
+      <!-- Group 1: Typography Stack -->
+      <section class="group">
+        <h2 class="group-label">Typography</h2>
+        <div class="card radio-list" role="radiogroup" aria-label="Font Preset">
+          <label class="radio-row" data-preset="chatgpt">
+            <input type="radio" name="fontPreset" value="chatgpt" />
+            <span class="preview-glyph font-chatgpt" aria-hidden="true">Aa</span>
+            <span class="row-copy">
+              <span class="row-title">ChatGPT Native Stack</span>
+              <span class="row-meta">System UI · Crisp &amp; Neutral</span>
+            </span>
+            <span class="radio-check" aria-hidden="true"></span>
+          </label>
+
+          <label class="radio-row" data-preset="inter">
+            <input type="radio" name="fontPreset" value="inter" />
+            <span class="preview-glyph font-inter" aria-hidden="true">Aa</span>
+            <span class="row-copy">
+              <span class="row-title">Clean Sans</span>
+              <span class="row-meta">Inter / System · Geometric</span>
+            </span>
+            <span class="radio-check" aria-hidden="true"></span>
+          </label>
+
+          <label class="radio-row" data-preset="serif">
+            <input type="radio" name="fontPreset" value="serif" />
+            <span class="preview-glyph font-serif" aria-hidden="true">Aa</span>
+            <span class="row-copy">
+              <span class="row-title">Editorial Serif</span>
+              <span class="row-meta">Reading Prose · Clean UI</span>
+            </span>
+            <span class="radio-check" aria-hidden="true"></span>
+          </label>
+        </div>
+      </section>
+
+      <!-- Group 2: Reading Rhythm Sliders -->
+      <section class="group">
+        <h2 class="group-label">Reading Rhythm</h2>
+        <div class="card sliders-card">
+          <div class="slider-block">
+            <div class="slider-header">
+              <label for="slider-font-size" class="slider-title">Font Size</label>
+              <output for="slider-font-size" id="value-font-size" class="value-pill">16px</output>
+            </div>
+            <input
+              type="range"
+              id="slider-font-size"
+              class="range-input"
+              min="13"
+              max="20"
+              step="0.5"
+              value="16"
+            />
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="slider-block">
+            <div class="slider-header">
+              <label for="slider-line-height" class="slider-title">Line Spacing</label>
+              <output for="slider-line-height" id="value-line-height" class="value-pill">1.68</output>
+            </div>
+            <input
+              type="range"
+              id="slider-line-height"
+              class="range-input"
+              min="1.45"
+              max="1.95"
+              step="0.02"
+              value="1.68"
+            />
+          </div>
+        </div>
+      </section>
+
+      <!-- Group 3: Surface Polish -->
+      <section class="group">
+        <h2 class="group-label">Surface Polish</h2>
+        <div class="segmented" role="radiogroup" aria-label="Surface Polish Intensity">
+          <button type="button" class="seg-btn" data-polish="subtle" aria-pressed="false">Subtle</button>
+          <button type="button" class="seg-btn" data-polish="balanced" aria-pressed="true">Balanced</button>
+          <button type="button" class="seg-btn" data-polish="crisp" aria-pressed="false">Crisp</button>
+        </div>
+      </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <button type="button" id="btn-reset" class="reset-btn">Reset to defaults</button>
+      <span class="version-tag">v1.0.0</span>
+    </footer>
+  </main>
+
+  <script src="popup.js"></script>
+</body>
+</html>
