@@ -16,12 +16,18 @@
  * ---------------------------------------------------------------------------- */
 
 :root[data-cgf-enabled="true"] {
-  --cgf-font-ui: ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Helvetica, Arial, sans-serif;
-  --cgf-font-prose: ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Helvetica, Arial, sans-serif;
+  --cgf-font-sans-default: -apple-system-body, ui-sans-serif, -apple-system, system-ui, "Segoe UI", "Helvetica", "Apple Color Emoji", "Arial", sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
+  --cgf-font-ui: var(--cgf-font-sans-default);
+  --cgf-font-prose: var(--cgf-font-sans-default);
   --cgf-font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --cgf-fw-light: 300;
+  --cgf-fw-normal: 400;
+  --cgf-fw-medium: 500;
+  --cgf-fw-semibold: 500;
+  --cgf-fw-bold: 500;
   --cgf-font-size: 16px;
-  --cgf-line-height: 1.68;
-  --cgf-measure: 48rem; /* ~768px ChatGPT reading column */
+  --cgf-line-height: 1.70;
+  --cgf-measure: 52rem; /* ~832px ChatGPT reading column */
 
   /* Light Mode Palette */
   --cgf-bg-canvas: #ffffff;
@@ -70,10 +76,10 @@
   --cgf-bg-elevated: #1c1c1f;
   --cgf-bg-composer: #1a1a1c;
   --cgf-bg-user-bubble: #173e76;
-  --cgf-text-user-bubble: #f0f6ff;
-  --cgf-text-primary: #e7e7ea;
-  --cgf-text-strong: #ffffff;
-  --cgf-text-secondary: #a1a1aa;
+  --cgf-text-user-bubble: #e2ecfb;
+  --cgf-text-primary: #f9f9f9;
+  --cgf-text-strong: #f3f3f3;
+  --cgf-text-secondary: #9a9aa3;
   --cgf-text-muted: #71717a;
   --cgf-link: #60a5fa;
   --cgf-border-subtle: rgba(255, 255, 255, 0.1);
@@ -149,6 +155,7 @@
 
 :root[data-cgf-enabled="true"] body {
   font-family: var(--cgf-font-ui);
+  font-weight: var(--cgf-fw-normal);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -224,7 +231,7 @@
   user-query-content
 ) {
   font-size: var(--cgf-font-size);
-  line-height: var(--cgf-line-height);
+  line-height: var(--cgf-line-height) !important;
 }
 
 :root[data-cgf-enabled="true"] :is(
@@ -235,7 +242,8 @@
   user-query-content
 ) :is(p, li, blockquote, td, th) {
   font-size: var(--cgf-font-size);
-  line-height: var(--cgf-line-height);
+  font-weight: var(--cgf-fw-normal);
+  line-height: var(--cgf-line-height) !important;
 }
 
 /* ----------------------------------------------------------------------------
@@ -245,76 +253,168 @@
 :root[data-cgf-enabled="true"] :is(
   .conversation-container,
   response-container,
+  model-response,
   user-query
 ) {
-  max-width: min(100%, var(--cgf-measure));
-  margin-left: auto;
-  margin-right: auto;
+  max-width: min(calc(100% - 32px), var(--cgf-measure)) !important;
+  width: 100%;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  box-sizing: border-box;
+}
+
+:root[data-cgf-enabled="true"] :is(
+  .response-container-content,
+  .presented-response-container,
+  .response-content,
+  .model-response-text,
+  message-content,
+  .markdown,
+  .markdown-main-panel
+) {
+  max-width: 100% !important;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+:root[data-cgf-enabled="true"] :is(
+  .presented-response-container,
+  .response-content,
+  message-content,
+  .markdown-main-panel
+) {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
 
 :root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) p {
-  margin-top: 0;
-  margin-bottom: 0.95em;
-  letter-spacing: -0.003em;
+  margin-top: 0 !important;
+  margin-bottom: 1em !important;
+  letter-spacing: 0;
 }
 
 :root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) p:last-child {
-  margin-bottom: 0;
+  margin-bottom: 0 !important;
 }
 
-:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) strong {
-  font-weight: 650;
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) :is(strong, b) {
+  font-weight: var(--cgf-fw-semibold) !important;
   color: var(--cgf-text-strong);
 }
 
-:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) a:not([class*="chip"]):not([class*="citation"]) {
-  color: var(--cgf-link);
-  text-decoration: none;
-  text-underline-offset: 3px;
+/* ChatGPT-matched Prose Links (crisp primary text + subtle underline + ↗) */
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) a:not([class*="chip"]):not([class*="citation"]):not([class*="source"]):not([class*="button"]):not([role="button"]):not(sup a):not(:is(sources-carousel, .sources-carousel, sources-carousel-inline, .sources-carousel-inline, source-footnote, .source-footnote, [class*="source-inline"], [class*="citation"]) a) {
+  color: var(--cgf-text-strong) !important;
+  text-decoration: underline !important;
+  text-decoration-color: rgba(255, 255, 255, 0.38) !important;
+  text-underline-offset: 3px !important;
+  text-decoration-thickness: 1px !important;
+  transition: text-decoration-color 120ms ease;
 }
 
-:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) a:not([class*="chip"]):not([class*="citation"]):hover {
-  text-decoration: underline;
+:root[data-cgf-enabled="true"][data-cgf-theme="light"] :is(.markdown, .markdown-main-panel, message-content) a:not([class*="chip"]):not([class*="citation"]):not([class*="source"]):not([class*="button"]):not([role="button"]):not(sup a):not(:is(sources-carousel, .sources-carousel, sources-carousel-inline, .sources-carousel-inline, source-footnote, .source-footnote, [class*="source-inline"], [class*="citation"]) a) {
+  text-decoration-color: rgba(0, 0, 0, 0.35) !important;
+}
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) a:not([class*="chip"]):not([class*="citation"]):not([class*="source"]):not([class*="button"]):not([role="button"]):not(sup a):not(:is(sources-carousel, .sources-carousel, sources-carousel-inline, .sources-carousel-inline, source-footnote, .source-footnote, [class*="source-inline"], [class*="citation"]) a):hover {
+  text-decoration-color: currentColor !important;
+}
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) a[href^="http"]:not([class*="chip"]):not([class*="citation"]):not([class*="source"]):not([class*="button"]):not([role="button"]):not(sup a):not(:is(sources-carousel, .sources-carousel, sources-carousel-inline, .sources-carousel-inline, source-footnote, .source-footnote, [class*="source-inline"], [class*="citation"]) a):not(:has(img)):not(:has(svg))::after {
+  content: "\00a0↗";
+  font-family: var(--cgf-font-ui);
+  font-size: 0.72em;
+  font-weight: 400;
+  opacity: 0.5;
+  display: inline-block;
+  text-decoration: none;
+  vertical-align: 0.12em;
+  transition: opacity 120ms ease;
+}
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) a[href^="http"]:not([class*="chip"]):not([class*="citation"]):not([class*="source"]):not([class*="button"]):not([role="button"]):not(sup a):not(:is(sources-carousel, .sources-carousel, sources-carousel-inline, .sources-carousel-inline, source-footnote, .source-footnote, [class*="source-inline"], [class*="citation"]) a):not(:has(img)):not(:has(svg)):hover::after {
+  opacity: 0.92;
 }
 
 /* Clear ChatGPT Headings Hierarchy */
 :root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) :is(h1, h2, h3, h4) {
   font-family: var(--cgf-font-prose);
-  font-weight: 650;
+  font-weight: var(--cgf-fw-semibold) !important;
   color: var(--cgf-text-strong);
-  letter-spacing: -0.018em;
-  line-height: 1.32;
-  margin-top: 1.45em;
-  margin-bottom: 0.55em;
+  letter-spacing: -0.01em;
+  line-height: 1.35 !important;
+  margin-top: 1.5em !important;
+  margin-bottom: 0.65em !important;
 }
 
-:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) h1 { font-size: 1.5em; }
-:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) h2 { font-size: 1.26em; }
-:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) h3 { font-size: 1.1em; }
-:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) h4 { font-size: 1em; font-weight: 600; }
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) h1 { font-size: 1.4em; }
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) h2 { font-size: 1.22em; }
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) h3 { font-size: 1.06em; }
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) h4 { font-size: 1em; font-weight: var(--cgf-fw-semibold) !important; }
 
 :root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) :is(h1, h2, h3, h4):first-child {
-  margin-top: 0.1em;
+  margin-top: 0 !important;
 }
 
-/* Lists (preserve native marker to avoid double bullets) */
+/* Lists (single solid ChatGPT bullets, airy ChatGPT spacing) */
 :root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) ul,
 :root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) ol {
-  margin-top: 0.35em;
-  margin-bottom: 1em;
-  padding-left: 1.45em;
+  margin-top: 0.5em !important;
+  margin-bottom: 1em !important;
+  padding-left: 1.35em !important;
+}
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) ul,
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) ol ul,
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) ul ul {
+  list-style-type: disc !important;
+}
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) ul ul ul {
+  list-style-type: circle !important;
+}
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) ol {
+  list-style-type: decimal !important;
+}
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) :is(ul, ol) :is(ul, ol) {
+  margin-top: 0.45em !important;
+  margin-bottom: 0.25em !important;
 }
 
 :root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) li {
-  margin-bottom: 0.38em;
+  margin-top: 0 !important;
+  margin-bottom: 0.55em !important;
+  padding-left: 0.3em !important;
+}
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) li::before {
+  content: none !important;
+  display: none !important;
+}
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) li:has(> ul:only-child),
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) li:has(> ol:only-child) {
+  list-style-type: none !important;
+  padding-left: 0 !important;
+}
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) li::marker {
+  color: var(--cgf-text-primary);
 }
 
 :root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) li:last-child {
-  margin-bottom: 0;
+  margin-bottom: 0 !important;
 }
 
 :root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) li > p {
-  margin-bottom: 0.42em;
+  margin-top: 0 !important;
+  margin-bottom: 0.45em !important;
+}
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) li > p:last-child {
+  margin-bottom: 0 !important;
 }
 
 /* Task List Checkboxes */
@@ -332,7 +432,7 @@
 :root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) hr {
   border: 0;
   border-top: 1px solid var(--cgf-border-subtle);
-  margin: 1.65em 0;
+  margin: 1.2em 0 !important;
 }
 
 /* ChatGPT-style Clean Tables */
@@ -345,23 +445,23 @@
 :root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) table {
   border-collapse: collapse;
   width: 100%;
-  margin: 1.15em 0;
+  margin: 0.85em 0 !important;
   font-size: 0.92em;
   background: transparent !important;
 }
 
 :root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) :is(th, td) {
-  padding: 10px 14px;
+  padding: 8px 12px;
   border: 0;
   border-bottom: 1px solid var(--cgf-border-subtle);
   text-align: left;
   font-size: 0.92em;
-  line-height: 1.5;
+  line-height: 1.45 !important;
   vertical-align: top;
 }
 
 :root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) th {
-  font-weight: 650;
+  font-weight: var(--cgf-fw-semibold);
   color: var(--cgf-text-strong);
   border-bottom: 1px solid var(--cgf-border-strong);
 }
@@ -397,7 +497,7 @@
 
 :root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) details > summary {
   cursor: pointer;
-  font-weight: 600;
+  font-weight: var(--cgf-fw-semibold);
   color: var(--cgf-text-strong);
   list-style-position: inside;
 }
@@ -406,22 +506,286 @@
   margin-bottom: 8px;
 }
 
-/* Citations */
+/* Citations & Reference Pills — Hidden by default; toggled via top-right pill */
+:root[data-cgf-enabled="true"][data-cgf-show-refs="false"] :is(.markdown, .markdown-main-panel, message-content, model-response, response-container) :is(
+  sources-carousel-inline,
+  .sources-carousel-inline,
+  source-inline-chip,
+  .source-inline-chip,
+  .source-inline-chip-container,
+  source-footnote,
+  .source-footnote,
+  citation-chip,
+  .citation-chip,
+  sources-carousel,
+  .sources-carousel,
+  .grounding-sources,
+  .source-footnotes,
+  [class*="source-inline"],
+  [class*="source-chip"],
+  [class*="citation-chip"],
+  [class*="citation-link"],
+  sup.citation,
+  sup:has(> a)
+) {
+  display: none !important;
+}
+
+/* Top-Right Reference Links Toggle Button */
+:root[data-cgf-enabled="false"] .cgf-ref-toggle {
+  display: none !important;
+}
+
+:root[data-cgf-enabled="true"] .cgf-ref-toggle {
+  position: fixed !important;
+  top: 60px !important;
+  right: 16px !important;
+  z-index: 2147483000 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 30px !important;
+  height: 30px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  user-select: none !important;
+  background-color: rgba(16, 16, 18, 0.88) !important;
+  color: rgba(255, 255, 255, 0.55) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35) !important;
+  backdrop-filter: blur(8px);
+  transition: background-color 140ms ease, color 140ms ease, border-color 140ms ease !important;
+}
+
+:root[data-cgf-enabled="true"] .cgf-ref-toggle:hover {
+  background-color: rgba(34, 34, 38, 0.96) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.24) !important;
+}
+
+:root[data-cgf-enabled="true"] .cgf-ref-toggle[aria-pressed="true"] {
+  background-color: rgba(255, 255, 255, 0.14) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.28) !important;
+}
+
+:root[data-cgf-enabled="true"][data-cgf-theme="light"] .cgf-ref-toggle {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  color: #5d5d5d !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+}
+
+:root[data-cgf-enabled="true"][data-cgf-theme="light"] .cgf-ref-toggle:hover,
+:root[data-cgf-enabled="true"][data-cgf-theme="light"] .cgf-ref-toggle[aria-pressed="true"] {
+  background-color: #f4f4f5 !important;
+  color: #0d0d0d !important;
+  border-color: rgba(0, 0, 0, 0.24) !important;
+}
+
+:root[data-cgf-enabled="true"] :is(model-response, message-content:not(model-response *), .markdown-main-panel:not(message-content *)) {
+  counter-reset: cgf-ref 0;
+}
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) :is(
+  sources-carousel-inline,
+  .sources-carousel-inline,
+  .source-inline-chip-container,
+  source-footnote,
+  .source-footnote
+) {
+  display: inline !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
 :root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) :is(
   .source-inline-chip,
   .citation-chip,
+  [class*="citation-chip"],
+  [class*="citation-link"]
+):not(:is(.source-inline-chip, .citation-chip, [class*="citation-chip"], [class*="citation-link"]) *) {
+  counter-increment: cgf-ref;
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  vertical-align: 1px !important;
+  min-width: 18px !important;
+  height: 18px !important;
+  padding: 0 5px !important;
+  border-radius: 999px !important;
+  background-color: #080809 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: none !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  color: transparent !important;
+  text-decoration: none !important;
+  margin: 0 2px !important;
+  cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease !important;
+}
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) sup a {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  vertical-align: 1px !important;
+  min-width: 18px !important;
+  height: 18px !important;
+  padding: 0 5px !important;
+  border-radius: 999px !important;
+  background-color: #080809 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: none !important;
+  font-size: 10.5px !important;
+  font-weight: 500 !important;
+  line-height: 1 !important;
+  color: rgba(255, 255, 255, 0.45) !important;
+  text-decoration: none !important;
+  margin: 0 2px !important;
+  transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease !important;
+}
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) :is(
+  .source-inline-chip,
+  .citation-chip,
+  [class*="citation-chip"],
+  [class*="citation-link"]
+):not(:is(.source-inline-chip, .citation-chip, [class*="citation-chip"], [class*="citation-link"]) *)::after {
+  content: counter(cgf-ref) !important;
+  display: inline-block !important;
+  font-family: var(--cgf-font-ui) !important;
+  font-size: 10.5px !important;
+  font-weight: 500 !important;
+  line-height: 1 !important;
+  color: rgba(255, 255, 255, 0.45) !important;
+  transition: color 120ms ease !important;
+}
+
+:root[data-cgf-enabled="true"][data-cgf-theme="light"] :is(.markdown, .markdown-main-panel, message-content) :is(
+  .source-inline-chip,
+  .citation-chip,
+  [class*="citation-chip"],
+  [class*="citation-link"]
+):not(:is(.source-inline-chip, .citation-chip, [class*="citation-chip"], [class*="citation-link"]) *),
+:root[data-cgf-enabled="true"][data-cgf-theme="light"] :is(.markdown, .markdown-main-panel, message-content) sup a {
+  background-color: rgba(0, 0, 0, 0.04) !important;
+  border-color: rgba(0, 0, 0, 0.09) !important;
+}
+
+:root[data-cgf-enabled="true"][data-cgf-theme="light"] :is(.markdown, .markdown-main-panel, message-content) sup a,
+:root[data-cgf-enabled="true"][data-cgf-theme="light"] :is(.markdown, .markdown-main-panel, message-content) :is(
+  .source-inline-chip,
+  .citation-chip,
+  [class*="citation-chip"],
+  [class*="citation-link"]
+):not(:is(.source-inline-chip, .citation-chip, [class*="citation-chip"], [class*="citation-link"]) *)::after {
+  color: rgba(0, 0, 0, 0.5) !important;
+}
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) :is(
+  .source-inline-chip,
+  .citation-chip,
+  [class*="citation-chip"],
+  [class*="citation-link"]
+) span {
+  font-size: 0 !important;
+  line-height: 0 !important;
+  color: transparent !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) :is(
+  .source-inline-chip,
+  .citation-chip,
+  [class*="citation-chip"],
+  [class*="citation-link"]
+) :is(a, button) {
+  position: absolute !important;
+  inset: 0 !important;
+  opacity: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  cursor: pointer !important;
+}
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) :is(
+  .source-inline-chip,
+  .citation-chip,
+  [class*="citation-chip"],
+  [class*="citation-link"],
   sup a
-) {
-  display: inline-flex;
-  align-items: center;
-  padding: 1px 7px;
-  border-radius: 999px;
-  background-color: var(--cgf-inline-code-bg);
-  color: var(--cgf-link);
-  font-size: 11.5px;
-  font-weight: 550;
-  text-decoration: none;
-  margin: 0 2px;
+) :is(mat-icon, .mat-icon, google-symbols, .google-symbols, svg, img, [class*="icon"], [class*="dot"], [class*="favicon"]),
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) :is(
+  .source-inline-chip,
+  .citation-chip,
+  [class*="citation-chip"],
+  [class*="citation-link"]
+)::before {
+  display: none !important;
+  content: none !important;
+}
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) :is(
+  .source-inline-chip,
+  .citation-chip,
+  [class*="citation-chip"],
+  [class*="citation-link"]
+):not(:is(.source-inline-chip, .citation-chip, [class*="citation-chip"], [class*="citation-link"]) *):hover,
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) sup a:hover {
+  background-color: #18181b !important;
+  border-color: rgba(255, 255, 255, 0.22) !important;
+  color: var(--cgf-text-primary) !important;
+}
+
+:root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) :is(
+  .source-inline-chip,
+  .citation-chip,
+  [class*="citation-chip"],
+  [class*="citation-link"]
+):not(:is(.source-inline-chip, .citation-chip, [class*="citation-chip"], [class*="citation-link"]) *):hover::after {
+  color: var(--cgf-text-primary) !important;
+}
+
+:root[data-cgf-enabled="true"][data-cgf-theme="light"] :is(.markdown, .markdown-main-panel, message-content) :is(
+  .source-inline-chip,
+  .citation-chip,
+  [class*="citation-chip"],
+  [class*="citation-link"]
+):not(:is(.source-inline-chip, .citation-chip, [class*="citation-chip"], [class*="citation-link"]) *):hover,
+:root[data-cgf-enabled="true"][data-cgf-theme="light"] :is(.markdown, .markdown-main-panel, message-content) sup a:hover {
+  background-color: rgba(0, 0, 0, 0.09) !important;
+  border-color: rgba(0, 0, 0, 0.2) !important;
+  color: var(--cgf-text-primary) !important;
+}
+
+:root[data-cgf-enabled="true"][data-cgf-theme="light"] :is(.markdown, .markdown-main-panel, message-content) :is(
+  .source-inline-chip,
+  .citation-chip,
+  [class*="citation-chip"],
+  [class*="citation-link"]
+):not(:is(.source-inline-chip, .citation-chip, [class*="citation-chip"], [class*="citation-link"]) *):hover::after {
+  color: var(--cgf-text-primary) !important;
+}
+
+:root[data-cgf-enabled="true"] :is(sources-carousel, .sources-carousel, .grounding-sources, .source-footnotes) {
+  opacity: 0.68;
+  transition: opacity 150ms ease;
+}
+
+:root[data-cgf-enabled="true"] :is(sources-carousel, .sources-carousel, .grounding-sources, .source-footnotes):hover {
+  opacity: 1;
 }
 
 /* ----------------------------------------------------------------------------
@@ -429,11 +793,11 @@
  * ---------------------------------------------------------------------------- */
 
 :root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) blockquote {
-  margin: 1.05em 0;
-  padding: 10px 15px;
+  margin: 0.75em 0 !important;
+  padding: 4px 14px !important;
   border-left: 3px solid var(--cgf-quote-border);
   background: var(--cgf-quote-bg);
-  border-radius: 0 10px 10px 0;
+  border-radius: 0 8px 8px 0;
 }
 
 :root[data-cgf-enabled="true"] :is(
@@ -453,9 +817,9 @@
 
 :root[data-cgf-enabled="true"] :is(.markdown, .markdown-main-panel, message-content) :not(pre) > code:not(.katex *),
 :root[data-cgf-enabled="true"] .query-text :not(pre) > code {
-  font-size: 0.855em;
-  padding: 0.15em 0.44em;
-  border-radius: 6px;
+  font-size: 0.875em;
+  padding: 0.12em 0.38em;
+  border-radius: 5px;
   white-space: break-spaces;
   word-break: break-word;
 }
@@ -481,7 +845,7 @@
   padding: 15px 18px;
   margin: 0;
   font-size: 0.87em;
-  line-height: 1.58;
+  line-height: 1.5;
   border-radius: 14px;
   color: var(--cgf-code-text);
 }
@@ -755,7 +1119,7 @@
   border-radius: 16px !important;
   overflow: hidden !important;
   padding: 0 !important;
-  margin: 1em 0 !important;
+  margin: 0.75em 0 !important;
   box-shadow: none !important;
 }
 
@@ -845,7 +1209,8 @@
   input-area-v2,
   .input-area-container
 ) {
-  max-width: min(100%, var(--cgf-measure)) !important;
+  max-width: min(calc(100% - 32px), var(--cgf-measure)) !important;
+  width: 100%;
   margin-left: auto !important;
   margin-right: auto !important;
 }

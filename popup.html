@@ -98,16 +98,16 @@
           <div class="slider-block">
             <div class="slider-header">
               <label for="slider-line-height" class="slider-title">Line Spacing</label>
-              <output for="slider-line-height" id="value-line-height" class="value-pill">1.68</output>
+              <output for="slider-line-height" id="value-line-height" class="value-pill">1.70</output>
             </div>
             <input
               type="range"
               id="slider-line-height"
               class="range-input"
-              min="1.45"
-              max="1.95"
+              min="1.30"
+              max="1.85"
               step="0.02"
-              value="1.68"
+              value="1.70"
             />
           </div>
         </div>
@@ -120,6 +120,22 @@
           <button type="button" class="seg-btn" data-polish="subtle" aria-pressed="false">Subtle</button>
           <button type="button" class="seg-btn" data-polish="balanced" aria-pressed="true">Balanced</button>
           <button type="button" class="seg-btn" data-polish="crisp" aria-pressed="false">Crisp</button>
+        </div>
+      </section>
+
+      <!-- Group 4: Reference Links -->
+      <section class="group">
+        <div class="card toggle-row">
+          <div class="row-copy">
+            <span class="row-title">Show Reference Links</span>
+            <span class="row-meta">Off by default · Also in Gemini top-right</span>
+          </div>
+          <label class="ios-switch ios-switch-sm" title="Show or hide Gemini inline reference links">
+            <input type="checkbox" id="toggle-show-refs" aria-label="Show Reference Links" />
+            <span class="switch-track">
+              <span class="switch-thumb"></span>
+            </span>
+          </label>
         </div>
       </section>
     </div>

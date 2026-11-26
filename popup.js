@@ -13,8 +13,9 @@
     enabled: true,
     fontPreset: 'chatgpt',
     fontSize: 16,
-    lineHeight: 1.68,
-    polishIntensity: 'balanced'
+    lineHeight: 1.70,
+    polishIntensity: 'balanced',
+    showReferenceLinks: false
   };
 
   let state = { ...DEFAULT_SETTINGS };
@@ -22,6 +23,7 @@
 
   // DOM References
   const toggleEnabled = document.getElementById('toggle-enabled');
+  const toggleShowRefs = document.getElementById('toggle-show-refs');
   const controlsStack = document.getElementById('controls-stack');
   const statusBar = document.getElementById('status-bar');
   const statusText = document.getElementById('status-text');
@@ -61,6 +63,10 @@
     for (const btn of polishButtons) {
       const active = btn.dataset.polish === state.polishIntensity;
       btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+    }
+
+    if (toggleShowRefs) {
+      toggleShowRefs.checked = Boolean(state.showReferenceLinks);
     }
 
     updateStatusBanner();
@@ -158,6 +164,12 @@
     for (const btn of polishButtons) {
       btn.addEventListener('click', () => {
         saveAndBroadcast({ polishIntensity: btn.dataset.polish });
+      });
+    }
+
+    if (toggleShowRefs) {
+      toggleShowRefs.addEventListener('change', () => {
+        saveAndBroadcast({ showReferenceLinks: toggleShowRefs.checked });
       });
     }
 

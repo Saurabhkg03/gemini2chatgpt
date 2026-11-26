@@ -16,8 +16,8 @@
 
   const FONT_PRESETS = {
     chatgpt: {
-      ui: 'ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Helvetica, Arial, sans-serif',
-      prose: 'ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Helvetica, Arial, sans-serif'
+      ui: '-apple-system-body, ui-sans-serif, -apple-system, system-ui, "Segoe UI", "Helvetica", "Apple Color Emoji", "Arial", sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"',
+      prose: '-apple-system-body, ui-sans-serif, -apple-system, system-ui, "Segoe UI", "Helvetica", "Apple Color Emoji", "Arial", sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"'
     },
     inter: {
       ui: '"Inter", "Inter Variable", ui-sans-serif, -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
@@ -36,8 +36,9 @@
     enabled: true,
     fontPreset: 'chatgpt',
     fontSize: 16,
-    lineHeight: 1.68,
-    polishIntensity: 'balanced'
+    lineHeight: 1.70,
+    polishIntensity: 'balanced',
+    showReferenceLinks: false
   };
 
   let currentSettings = { ...DEFAULT_SETTINGS };
@@ -56,11 +57,13 @@
     merged.fontSize = Number.isFinite(size) ? Math.min(20, Math.max(13, size)) : DEFAULT_SETTINGS.fontSize;
 
     const lh = Number(merged.lineHeight);
-    merged.lineHeight = Number.isFinite(lh) ? Math.min(1.95, Math.max(1.45, lh)) : DEFAULT_SETTINGS.lineHeight;
+    merged.lineHeight = Number.isFinite(lh) ? Math.min(1.85, Math.max(1.3, lh)) : DEFAULT_SETTINGS.lineHeight;
 
     if (!['subtle', 'balanced', 'crisp'].includes(merged.polishIntensity)) {
       merged.polishIntensity = DEFAULT_SETTINGS.polishIntensity;
     }
+
+    merged.showReferenceLinks = Boolean(merged.showReferenceLinks);
 
     return merged;
   }
@@ -134,6 +137,46 @@
     });
   }
 
+  const REF_ICON_HIDDEN_SVG =
+    '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+
+  const REF_ICON_SHOWN_SVG =
+    '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+
+  function updateRefToggleButton() {
+    const btn = document.getElementById('cgf-ref-toggle');
+    if (!btn) return;
+    const shown = Boolean(currentSettings.showReferenceLinks);
+    const label = shown ? 'Hide reference links' : 'Show reference links';
+    btn.setAttribute('aria-pressed', shown ? 'true' : 'false');
+    btn.setAttribute('aria-label', label);
+    btn.title = label;
+    btn.innerHTML = shown ? REF_ICON_SHOWN_SVG : REF_ICON_HIDDEN_SVG;
+  }
+
+  function ensureRefToggleButton() {
+    if (!document.body) return;
+    let btn = document.getElementById('cgf-ref-toggle');
+    if (!btn) {
+      btn = document.createElement('button');
+      btn.id = 'cgf-ref-toggle';
+      btn.type = 'button';
+      btn.className = 'cgf-ref-toggle';
+      btn.addEventListener('click', () => {
+        const next = {
+          ...currentSettings,
+          showReferenceLinks: !currentSettings.showReferenceLinks
+        };
+        applySettings(next);
+        if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+          chrome.storage.local.set({ [STORAGE_KEY]: currentSettings });
+        }
+      });
+      document.body.appendChild(btn);
+    }
+    updateRefToggleButton();
+  }
+
   function applySettings(settings) {
     currentSettings = normalizeSettings(settings);
     const root = document.documentElement;
@@ -142,7 +185,9 @@
     root.setAttribute('data-cgf-enabled', currentSettings.enabled ? 'true' : 'false');
     root.setAttribute('data-cgf-preset', currentSettings.fontPreset);
     root.setAttribute('data-cgf-polish', currentSettings.polishIntensity);
+    root.setAttribute('data-cgf-show-refs', currentSettings.showReferenceLinks ? 'true' : 'false');
     syncThemeAttribute();
+    ensureRefToggleButton();
 
     if (!currentSettings.enabled) {
       root.style.removeProperty('--cgf-font-ui');
@@ -167,12 +212,16 @@
     const attrFilter = ['class', 'data-theme', 'data-color-scheme', 'theme', 'style'];
     themeObserver = new MutationObserver((mutations) => {
       for (const m of mutations) {
-        if (m.target === document.documentElement && m.attributeName === 'data-cgf-enabled') {
+        if (
+          m.target === document.documentElement &&
+          (m.attributeName === 'data-cgf-enabled' || m.attributeName === 'data-cgf-show-refs')
+        ) {
           continue;
         }
         if (
           m.target === document.documentElement &&
-          !document.documentElement.hasAttribute('data-cgf-enabled')
+          (!document.documentElement.hasAttribute('data-cgf-enabled') ||
+            !document.documentElement.hasAttribute('data-cgf-show-refs'))
         ) {
           applySettings(currentSettings);
           return;
@@ -184,7 +233,7 @@
     if (document.documentElement) {
       themeObserver.observe(document.documentElement, {
         attributes: true,
-        attributeFilter: [...attrFilter, 'data-cgf-enabled']
+        attributeFilter: [...attrFilter, 'data-cgf-enabled', 'data-cgf-show-refs']
       });
     }
 
@@ -194,6 +243,7 @@
         attributeFilter: attrFilter
       });
       syncThemeAttribute();
+      ensureRefToggleButton();
     } else {
       window.addEventListener(
         'DOMContentLoaded',
@@ -205,6 +255,7 @@
             });
           }
           syncThemeAttribute();
+          ensureRefToggleButton();
         },
         { once: true, passive: true }
       );
